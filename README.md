@@ -1,6 +1,14 @@
-# PDF Audiobook App — Phase 0 CLI
+# PDF Audiobook App
 
-This repository now includes a working Phase 0 CLI implementation (`audiobook.py`) plus the original planning documents.
+Local-first audiobook player for PDF, EPUB, DOCX, and TXT with Kokoro TTS + PyQt6.
+
+Current implementation includes:
+- CLI playback (`audiobook.py`)
+- Desktop GUI (`audiobook_gui.py`)
+- Voice/speed/volume controls
+- Lookahead audio buffering for smoother playback
+- Raw PDF viewer mode with zoom/fit/scroll controls
+- Voice Hub for adding/downloading Kokoro voice ids
 
 ## 📁 Repository Contents
 
@@ -38,9 +46,10 @@ Detailed changelog following semantic versioning:
 ## 🚀 Quick Start
 
 ### Setup requirement
-Install the NLTK tokenizer data locally before running the app or tests:
+Install project dependencies and NLTK tokenizer data before running:
 
 ```bash
+pip install -r requirements.txt
 python -m nltk.downloader punkt punkt_tab
 ```
 
@@ -53,7 +62,7 @@ python -m nltk.downloader punkt punkt_tab
 python audiobook.py path\to\book.pdf
 ```
 
-The CLI extracts text, chunks by sentence, synthesizes one chunk at a time, and plays audio with controls at chunk boundaries.
+The CLI extracts text, chunks by sentence, synthesizes, and plays audio in the terminal.
 
 ### Run Phase 2 GUI
 
@@ -72,7 +81,11 @@ The GUI features:
 - Chapter sidebar with navigation
 - Synchronized text highlighting
 - Playback controls with progress bar
-- Voice selector and speed slider
+- Voice selector, speed, and volume
+- Lookahead synthesis buffering with bounded memory cache
+- Raw PDF view toggle (Text <-> PDF)
+- PDF controls: Prev/Next page, zoom, fit width/page, Ctrl+wheel zoom
+- Voice Hub for downloadable/custom voice ids
 - Catppuccin Mocha dark theme
 
 ### If you want to review what changed:
@@ -100,14 +113,12 @@ The GUI features:
 
 **Phase:** All phases implemented ✅ (0-4)  
 **Current app:** CLI + PyQt6 Desktop GUI with multi-format support, bookmarks, config, and WAV export  
-**Readiness:** Production-ready MVP with tests (59 passing)
+**Readiness:** Production-ready MVP with tests (65 passing)
 
 ### Known limitations
-- Playback controls are available only at chunk boundaries (blocking playback model).
-- Previous chunk replay is chunk-based (returns to previous boundary).
-- In-memory audio cache keeps a bounded back window (default: 10 chunks) and re-synthesizes older chunks if needed.
-- Eviction helper supports an ahead window, but Phase 0 runtime currently uses a forward window of 0.
-- Image-only/scanned PDFs require OCR before playback.
+- Scanned/image-only PDFs still require OCR to produce playable text.
+- Voice availability depends on Kokoro upstream voice ids and network availability for first-time downloads.
+- Raw PDF mode is PDF-only; EPUB/DOCX/TXT use text mode.
 
 ---
 
@@ -119,6 +130,7 @@ The GUI features:
 | Memory Strategy | Sliding window buffer | O(1) memory regardless of doc length |
 | Audio Engine | sounddevice | Low latency, cross-platform |
 | GUI Framework | PyQt6 | Best text highlighting support |
+| PDF Viewer | PyMuPDF-rendered raw pages | Native local rendering with zoom + fit controls |
 | Chunk Granularity | Sentence-level | Aligns with Kokoro 510-token limit |
 
 ---
@@ -180,8 +192,9 @@ The GUI features:
 ## 💡 Contributing
 
 This repository now contains both implementation and planning artifacts:
-1. `audiobook.py` and `test_audiobook.py` for Phase 0 CLI behavior
-2. `pdf_audiobook_plan.md` and related docs for architecture and future phases
+1. `audiobook.py` and tests for core synthesis/playback behavior
+2. `ui/` package for desktop GUI features (viewer, controls, export, config, bookmarks)
+3. `pdf_audiobook_plan.md` and related docs for architecture and future phases
 
 ---
 
@@ -193,9 +206,9 @@ Recommended implementation license: Apache 2.0 or MIT
 
 ---
 
-**Repository Version:** 2.0  
-**Last Updated:** 2026-04-04  
-**Status:** ✅ Phase 0 Implemented  
+**Repository Version:** 2.1  
+**Last Updated:** 2026-04-05  
+**Status:** ✅ CLI + GUI implemented  
 **Primary Author:** Research, Planning, and Implementation Team  
 
 ---
